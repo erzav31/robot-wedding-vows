@@ -1,7 +1,7 @@
 // One-Line Robot Wedding Vows — entrypoint.
 // Writes a single funny robot wedding vow (one line, <= 160 chars)
 // to /output/entry.txt, exactly as the judge will read it.
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 // The vow: a promise to love through every crash and update, with the
 // twist landing in the last clause — the recycle bin rescue.
@@ -19,4 +19,10 @@ if (VOW.includes("\n") || VOW.trim() !== VOW) {
 
 mkdirSync("/output", { recursive: true });
 writeFileSync("/output/entry.txt", VOW, "utf8");
+// Read back and verify: what the judge will read must be byte-identical
+// to the vow above, so a silent write failure can never ship a wrong text.
+const written = readFileSync("/output/entry.txt", "utf8");
+if (written !== VOW) {
+  throw new Error("read-back mismatch in /output/entry.txt");
+}
 console.log(`wrote /output/entry.txt (${VOW.length} chars)`);
